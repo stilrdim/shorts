@@ -3,7 +3,6 @@ const path = require("path");
 
 const BASE_FOLDER = path.join(__dirname, "results");
 const FOOD_FILENAME = "foods.txt";
-const TODAYS_FOLDER = path.join(BASE_FOLDER, getDate())
 
 
 function sleep(secs) {
@@ -15,19 +14,6 @@ function getDate() {
   return new Date().toISOString().split("T")[0]
 }
 
-function initializeFolder() {
-  // Create new folder and /images/ inside it
-  const imagesPath = path.join(TODAYS_FOLDER, "images")
-
-  fs.mkdirSync(imagesPath, { recursive: true })
-
-  const foodsPath = path.join(TODAYS_FOLDER, FOOD_FILENAME);
-
-  // Create new foods.txt
-  if (!fs.existsSync(foodsPath)) {
-    fs.writeFileSync(foodsPath, "", "utf-8");
-  }
-}
 
 function fetchFoods(date) {
   const foodFile = path.join(BASE_FOLDER, date, FOOD_FILENAME);
