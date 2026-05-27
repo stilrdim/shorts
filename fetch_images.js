@@ -58,7 +58,7 @@ function main() {
     map.set(food, generateURL(food));
   }
 
-  console.log(map.entries())
+  console.log(map)
 
   console.log("\n", foodList.join(", "))
 }
