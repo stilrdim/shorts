@@ -1,0 +1,11 @@
+.env
+node_modules/
+*test.js
+test*
+*.exe
+*.rar
+*.zip
+results/
+*_working.js
+*.mp3
+upload.js
