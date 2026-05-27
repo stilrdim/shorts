@@ -5,7 +5,7 @@ test*
 *.exe
 *.rar
 *.zip
-results/
 *_working.js
 *.mp3
 upload.js
+*-*-*

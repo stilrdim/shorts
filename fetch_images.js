@@ -1,9 +1,10 @@
 const fs = require("fs");
 const path = require("path");
-const puppeteer = require("puppeteer");
 
-const BASE_FOLDER = `${__dirname}/results`;
+const BASE_FOLDER = path.join(__dirname, "results");
 const FOOD_FILENAME = "foods.txt";
+const TODAYS_FOLDER = path.join(BASE_FOLDER, getDate())
+
 
 function sleep(secs) {
   return new Promise(r => setTimeout(r, secs * 1000))
@@ -12,6 +13,20 @@ function sleep(secs) {
 function getDate() {
   // Example: 2026-05-27
   return new Date().toISOString().split("T")[0]
+}
+
+function initializeFolder() {
+  // Create new folder and /images/ inside it
+  const imagesPath = path.join(TODAYS_FOLDER, "images")
+
+  fs.mkdirSync(imagesPath, { recursive: true })
+
+  const foodsPath = path.join(TODAYS_FOLDER, FOOD_FILENAME);
+
+  // Create new foods.txt
+  if (!fs.existsSync(foodsPath)) {
+    fs.writeFileSync(foodsPath, "", "utf-8");
+  }
 }
 
 function fetchFoods(date) {
@@ -29,7 +44,8 @@ function fetchFoods(date) {
     return [];
   }
 
-  const foods = fileContent.split("\n").slice(1).map(f => f.trim()).filter(Boolean);
+  // Ignore the first 2 lines, those are edition-name and emojis
+  const foods = fileContent.split("\n").slice(2).map(f => f.trim()).filter(Boolean);
 
   return foods;
 }

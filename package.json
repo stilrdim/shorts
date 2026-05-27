@@ -4,19 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "1": "node initialize.js",
+    "init": "node initialize.js",
+    "initialize": "node initialize.js",
+    "2": "node fetch_images.js",
+    "3": "node make_slideshow.js",
+    "fetch": "node fetch_images.js",
+    "generate": "node make_slideshow.js",
+    "pipeline:init": "node initialize.js",
+    "pipeline:fetch": "node fetch_images.js",
+    "pipeline:build": "node make_slideshow.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
-  "dependencies": {
-    "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "axios": "^1.16.1",
-    "dotenv": "^17.4.2",
-    "edge-tts-node": "^1.5.7",
-    "fluent-ffmpeg": "^2.1.3",
-    "puppeteer": "^25.1.0",
-    "sharp": "^0.34.5"
-  }
+  "type": "commonjs"
 }
