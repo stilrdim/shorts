@@ -5,27 +5,50 @@ const path = require("path");
 const date = new Date().toISOString().split("T")[0]
 
 const BASE_DIR = path.join(__dirname, "results");
-const TODAYS_FOLDER = path.join(BASE_DIR, date);
 const FOOD_FILENAME = "foods.txt";
 
 
-function initializeFolder() {
+function initializeFolder(folderName) {
+  const folderBasePath = path.join(BASE_DIR, folderName);
+
   // Create new folder and /images/ inside it
-  const imagesPath = path.join(TODAYS_FOLDER, "images")
+  const imagesPath = path.join(folderBasePath, "images")
 
   fs.mkdirSync(imagesPath, { recursive: true })
 
-  const foodsPath = path.join(TODAYS_FOLDER, FOOD_FILENAME);
+  const foodsPath = path.join(folderBasePath, FOOD_FILENAME);
 
   // Create new foods.txt
   if (!fs.existsSync(foodsPath)) {
     fs.writeFileSync(foodsPath, "", "utf-8");
   }
+
+  console.log(`Created folder ${folderName} with 'images/' and 'foods.txt'`)
+}
+
+function getWeeklyDates() {
+  let folderNames = [];
+  for (let i = 0; i <= 7; i++) {
+    const date = new Date();
+
+    date.setDate(date.getDate() + i);
+
+    const normalizedDate = date.toISOString().split("T")[0];
+
+    folderNames.push(normalizedDate)
+  }
+
+  return folderNames;
+}
+
+function generateWeeklyFolders() {
+  const weeklyDates = getWeeklyDates();
+
+  weeklyDates.forEach(date => initializeFolder(date))
 }
 
 function main() {
-  initializeFolder();
-  console.log(`Folder ${date} created.`);
+  generateWeeklyFolders()
 }
 
 main()
