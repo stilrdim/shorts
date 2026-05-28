@@ -10,10 +10,13 @@
     "2": "node fetch_images.js",
     "fetch": "node fetch_images.js",
     "3": "node make_slideshow.js",
+    "3c": "node make_slideshow.js --cta",
     "generate": "node make_slideshow.js",
+    "generatecta": "node make_slideshow.js --cta",
     "pipeline:init": "node initialize.js",
     "pipeline:fetch": "node fetch_images.js",
-    "pipeline:build": "node make_slideshow.js"
+    "pipeline:build": "node make_slideshow.js",
+    "pipeline:buildcta": "node make_slideshow.js --cta"
   },
   "keywords": [],
   "author": "",

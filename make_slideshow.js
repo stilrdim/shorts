@@ -3,21 +3,30 @@ const fs = require("fs");
 const path = require("path");
 
 // Voices preview: https://tts.travisvn.com/
-const VOICE = "en-US-AriaNeural";
+const MAIN_VOICE = "en-US-AriaNeural";
+const SECONDARY_VOICE = "en-US-EricNeural";
 
 function getDate() {
   return new Date().toISOString().split("T")[0];
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
 function pickRandom(arr, n) {
   return [...arr].sort(() => Math.random() - 0.5).slice(0, n);
 }
 
-function makeTTS(text, outPath, duration) {
+function makeTTS(text, outPath, duration, voice = MAIN_VOICE) {
   const safe = text.replace(/"/g, "'");
   const raw = outPath.replace(".mp3", "_raw.mp3").replace(/\\/g, "/");
   const safeOut = outPath.replace(/\\/g, "/");
-  execSync(`py -m edge_tts --voice ${VOICE} --text "${safe}" --write-media "${raw}"`, { stdio: "inherit" });
+  execSync(`py -m edge_tts --voice ${voice} --text "${safe}" --write-media "${raw}"`, { stdio: "inherit" });
   execSync(`ffmpeg -y -i "${raw}" -af "apad" -t ${duration} "${safeOut}"`, { stdio: "inherit" });
 }
 
@@ -30,11 +39,25 @@ const FOODS_CONTENT = fs.readFileSync(FOODS_TXT, "utf-8").split("\n")
 const EDITION = FOODS_CONTENT[0].trim();
 const EDITION_EMOJI = FOODS_CONTENT[1].trim(); // TODO: Make emoji work
 
+const ENABLE_CTA = process.argv.includes("--cta");
+
 fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
-const images = fs.readdirSync(INPUT_DIR)
-  .filter(f => /\.(png|webp|jpg|jpeg|avif)$/i.test(f))
-  .map(f => path.join(INPUT_DIR, f));
+// Convert any AVIF images to PNG before processing
+const avifs = fs.readdirSync(INPUT_DIR).filter(f => /\.avif$/i.test(f));
+for (const f of avifs) {
+  const inPath = path.join(INPUT_DIR, f).replace(/\\/g, "/");
+  const outPath = path.join(INPUT_DIR, f.replace(/\.avif$/i, ".png")).replace(/\\/g, "/");
+  console.log(`Converting AVIF: ${f}`);
+  execSync(`ffmpeg -y -i "${inPath}" "${outPath}"`, { stdio: "inherit" });
+  fs.unlinkSync(path.join(INPUT_DIR, f));
+}
+
+const images = shuffle(
+  fs.readdirSync(INPUT_DIR)
+    .filter(f => /\.(png|webp|jpg|jpeg)$/i.test(f))
+    .map(f => path.join(INPUT_DIR, f))
+)
 
 console.log("Images found:", images.length);
 console.log("Edition:", EDITION);
@@ -71,10 +94,10 @@ function makeIntro(outPath, duration = 5) {
   makeTTS(`Eat or Pass. ${EDITION} Edition`, audioOut, duration);
 
   const corners = [
-    { x: 150, y: 400 },
-    { x: 1080 - 300 - 150, y: 400 },
-    { x: 150, y: 1920 - 300 - 400 },
-    { x: 1080 - 300 - 150, y: 1920 - 300 - 400 },
+    { x: 125, y: 400 },
+    { x: 1080 - 300 - 225, y: 400 },
+    { x: 125, y: 1920 - 300 - 400 },
+    { x: 1080 - 300 - 225, y: 1920 - 300 - 400 },
   ];
 
   const filters = [
@@ -109,7 +132,7 @@ function makeIntro(outPath, duration = 5) {
   execSync(cmd, { stdio: "inherit" });
 }
 
-function makeClip(imagePath, text, outPath) {
+function makeClip(imagePath, text, outPath, voice = MAIN_VOICE) {
   const safeImage = imagePath.replace(/\\/g, "/");
   const safeOut = outPath.replace(/\\/g, "/");
   const audioOut = outPath.replace(".mp4", ".mp3").replace(/\\/g, "/");
@@ -117,14 +140,14 @@ function makeClip(imagePath, text, outPath) {
   const charDelay = 0.05;
   const duration = 3;
 
-  makeTTS(text, audioOut, duration);
+  makeTTS(text, audioOut, duration, voice);
 
   // build chained drawtext filters, one per character reveal
   // each takes previous output label as input
   // pre-calculate x offset based on full text width isn't possible in ffmpeg
   // so instead: left-align from a fixed start x, calculated to center the full word
   // we estimate character width at fontsize 96 ≈ 45px per char average
-  const avgCharWidth = 45;
+  const avgCharWidth = 46;
   const estimatedFullWidth = text.length * avgCharWidth;
   const startX = Math.floor((1080 - estimatedFullWidth) / 2);
 
@@ -166,10 +189,9 @@ function makeCTA(foodName, outPath, duration = 5) {
   const shareImg = path.join(__dirname, "results/assets/tiktok_share.png").replace(/\\/g, "/");
 
   const safe = foodName.toLowerCase().replace(/ /g, "_");
-  const exts = [".png", ".webp", ".jpg", ".jpeg", ".avif"];
-  const candidates = [1, 2, 3].flatMap(n =>
-    exts.map(ext => path.join(INPUT_DIR, `${safe}_${n}${ext}`))
-  ).filter(fs.existsSync);
+  const candidates = [1, 2, 3]
+    .map(n => path.join(INPUT_DIR, `${safe}_${n}.png`))
+    .filter(fs.existsSync);
   const foodImg = candidates.length
     ? candidates[0].replace(/\\/g, "/")
     : images.find(p => path.basename(p).toLowerCase().startsWith(safe))?.replace(/\\/g, "/");
@@ -250,17 +272,23 @@ const clips = [introOut];
 
 const shownFoods = [];
 
+// Pick a random image to change the voice for;   Ensure it's not first and not in the last 3
+const randomImageIndex = 1 + Math.floor(Math.random() * (images.length - 4));
+
 images.forEach((img, i) => {
   const name = path.basename(img)
     .replace(/\.[^/.]+$/, "")
     .replace(/_/g, " ");
   const out = path.join(OUTPUT_DIR, `clip_${i}.mp4`);
-  makeClip(img, name, out);
+
+  // Change the voice of one random slide for engagement bait
+  i === randomImageIndex ? makeClip(img, name, out, SECONDARY_VOICE) : makeClip(img, name, out)
+
   clips.push(out);
   shownFoods.push(name);
 
   // after 5th food (index 4), insert CTA
-  if (i === 4) {
+  if (i === 4 && ENABLE_CTA) {
     const ctaFood = shownFoods[Math.floor(Math.random() * shownFoods.length)];
     const ctaOut = path.join(OUTPUT_DIR, "clip_cta.mp4");
     makeCTA(ctaFood, ctaOut, 6);
@@ -284,3 +312,7 @@ execSync(
 );
 
 console.log("\nDONE:", OUTPUT_FINAL);
+console.log(`\n\n\nDifferent voice on slide ${randomImageIndex} (${path.basename(images[randomImageIndex])})`)
+console.log("\nUpload to\nhttps://studio.youtube.com/channel/UCAaRyww02jzv6SNlK2tqJ9Q\nhttps://www.tiktok.com/tiktokstudio/content")
+console.log(`\nDescription:\nEat or pass - ${EDITION.toLowerCase()} edition`)
+console.log(`\nHashtags:\n#eat #eatorpass #game #foodlover #pickyeater`)
