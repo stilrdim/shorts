@@ -33,7 +33,7 @@ const EDITION_EMOJI = FOODS_CONTENT[1].trim(); // TODO: Make emoji work
 fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
 const images = fs.readdirSync(INPUT_DIR)
-  .filter(f => /\.(png|webp|jpg|jpeg)$/i.test(f))
+  .filter(f => /\.(png|webp|jpg|jpeg|avif)$/i.test(f))
   .map(f => path.join(INPUT_DIR, f));
 
 console.log("Images found:", images.length);
@@ -166,9 +166,10 @@ function makeCTA(foodName, outPath, duration = 5) {
   const shareImg = path.join(__dirname, "results/assets/tiktok_share.png").replace(/\\/g, "/");
 
   const safe = foodName.toLowerCase().replace(/ /g, "_");
-  const candidates = [1, 2, 3]
-    .map(n => path.join(INPUT_DIR, `${safe}_${n}.png`))
-    .filter(fs.existsSync);
+  const exts = [".png", ".webp", ".jpg", ".jpeg", ".avif"];
+  const candidates = [1, 2, 3].flatMap(n =>
+    exts.map(ext => path.join(INPUT_DIR, `${safe}_${n}${ext}`))
+  ).filter(fs.existsSync);
   const foodImg = candidates.length
     ? candidates[0].replace(/\\/g, "/")
     : images.find(p => path.basename(p).toLowerCase().startsWith(safe))?.replace(/\\/g, "/");
