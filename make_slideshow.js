@@ -237,16 +237,14 @@ function makeOutro(outPath, duration = 5) {
   const safeOut = outPath.replace(/\\/g, "/");
   const audioOut = outPath.replace(".mp4", ".mp3").replace(/\\/g, "/");
 
-  makeTTS(`Comment your results, tag a friend and follow for more content like this`, audioOut, duration);
+  makeTTS(`Share your results in the comments and follow for more content like this`, audioOut, duration);
 
   const filters = [
     "[0:v]format=rgba[bg]",
-    `[bg]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='COMMENT':fontcolor=white:fontsize=110:x=(w-text_w)/2:y=(h/2)-280:box=1:boxcolor=#FF3333:boxborderw=20[t1]`,
-    `[t1]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='your results':fontcolor=black:fontsize=65:x=(w-text_w)/2:y=(h/2)-150[t2]`,
-    `[t2]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='TAG':fontcolor=white:fontsize=110:x=(w-text_w)/2:y=(h/2)-60:box=1:boxcolor=#FF3333:boxborderw=20[t3]`,
-    `[t3]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='a friend':fontcolor=black:fontsize=65:x=(w-text_w)/2:y=(h/2)+70[t4]`,
-    `[t4]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='FOLLOW':fontcolor=white:fontsize=110:x=(w-text_w)/2:y=(h/2)+230:box=1:boxcolor=#FF3333:boxborderw=20[t5]`,
-    `[t5]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='for more':fontcolor=black:fontsize=55:x=(w-text_w)/2:y=(h/2)+360[out]`
+    `[bg]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='COMMENT':fontcolor=white:fontsize=110:x=(w-text_w)/2:y=(h/2)-180:box=1:boxcolor=#FF3333:boxborderw=20[t1]`,
+    `[t1]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='your results':fontcolor=black:fontsize=65:x=(w-text_w)/2:y=(h/2)-40[t2]`,
+    `[t2]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='FOLLOW':fontcolor=white:fontsize=110:x=(w-text_w)/2:y=(h/2)+130:box=1:boxcolor=#FF3333:boxborderw=20[t3]`,
+    `[t3]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='for more':fontcolor=black:fontsize=55:x=(w-text_w)/2:y=(h/2)+260[out]`
   ].join(";");
 
   const cmd = [
