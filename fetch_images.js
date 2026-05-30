@@ -14,26 +14,25 @@ function getDate() {
   return new Date().toISOString().split("T")[0]
 }
 
-
-function fetchFoods(date) {
+function fetchFoodInfo(date) {
   const foodFile = path.join(BASE_FOLDER, date, FOOD_FILENAME);
 
   if (!fs.existsSync(foodFile)) {
     console.log("File not found");
-    return [];
+    return { foodListTitle: "", foodItems: [] }
   };
 
   const fileContent = fs.readFileSync(foodFile, "utf-8");
 
   if (fileContent.length < 1) {
-    console.log("Unable to fetch foods, file empty.");
-    return [];
+    console.log("Unable to fetch food file contents:\tFile empty");
+    return { foodListTitle: "", foodItems: [] };
   }
 
-  // Ignore the first 2 lines, those are edition-name and emojis
-  const foods = fileContent.split("\n").slice(2).map(f => f.trim()).filter(Boolean);
+  const foodListTitle = fileContent.split("\n")[0].trim() ?? "[!] UNKNOWN";
+  const foodItems = fileContent.split("\n").slice(2).map(f => f.trim()).filter(Boolean);
 
-  return foods;
+  return { foodListTitle, foodItems };
 }
 
 function generateURLs(foodList) {
@@ -44,23 +43,23 @@ function generateURLs(foodList) {
 }
 
 function generateURL(food) {
-  return `https://www.google.com/search?q=${encodeURIComponent(food)}&tbm=isch&tbs=ic:trans`
+  return `https://www.google.com/search?q=${encodeURIComponent(food)}&tbm=isch&tbs=ic:trans`;
 }
 
 
 function main() {
-  const foodList = fetchFoods(getDate());
-  const urls = generateURLs(foodList);
+  const { foodItems, foodListTitle } = fetchFoodInfo(getDate());
+  const urls = generateURLs(foodItems);
 
   const map = new Map();
 
-  for (const food of foodList) {
+  for (const food of foodItems) {
     map.set(food, generateURL(food));
   }
 
-  console.log(map)
-
-  console.log("\n", foodList.join(", "))
+  console.log(foodListTitle, "\n");
+  console.log(map);
+  console.log("\n", foodItems.join(", "));
 }
 
 main()
