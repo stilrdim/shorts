@@ -9,6 +9,7 @@
     "initialize": "node initialize.js",
     "2": "node fetch_images.js",
     "fetch": "node fetch_images.js",
+    "fetchextra": "node fetch_images.js --extradays",
     "3": "node make_slideshow.js",
     "3c": "node make_slideshow.js --cta",
     "generate": "node make_slideshow.js",

@@ -7,6 +7,7 @@
 3. First line in `foods.txt` is `EDITION_NAME` (Ex. `Picky Eater`), second line is emoji if needed
 4. Food items are on the remaining lines (3-17)
 5. Run `node fetch_images.js` or `npm run 2` / `npm run fetch`
+   > Use `node fetch_images.js --extraday 1` to check tomorrow's list or `npm run fetchextra 1` for **positives** _(tomorrow)_ and `npm run fetchextra -- -1` for **negatives** _(yesterday)_
 6. Use your terminal `CTRL + CLICK` to manually find images through Google Images
 7. Save images into folder `YYYY-MM-DD/images` titled by food name + extension (Ex. `Balut_Egg.png`). Supports `png` `webp` `jpg` `jpeg` (`avif` will be converted to `png`)
 8. Run `node make_slideshow.js` or `npm run 3` / `npm run generate`

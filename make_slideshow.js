@@ -6,8 +6,25 @@ const path = require("path");
 const MAIN_VOICE = "en-US-AriaNeural";
 const SECONDARY_VOICE = "en-US-EricNeural";
 
-function getDate() {
-  return new Date().toISOString().split("T")[0];
+// Process args
+// Toggle CTA for engagement bait   (targeted at TikTok)
+const ENABLE_CTA = process.argv.includes("--cta");
+
+// Able to run the script for tomorrow or further
+const extraDaysArg = process.argv.indexOf("--extradays");
+let EXTRA_DAYS = extraDaysArg !== -1 ? Number(process.argv[extraDaysArg + 1]) : 0;
+if (!EXTRA_DAYS) { // Empty space returning   undefined => NaN
+  EXTRA_DAYS = 0;
+}
+
+function getBaseDir() {
+  const date = new Date();
+
+  date.setDate(date.getDate() + EXTRA_DAYS);
+
+  const convertedDate = date.toISOString().split("T")[0];
+
+  return path.join(`${__dirname}/results/${convertedDate}`)
 }
 
 function shuffle(arr) {
@@ -30,7 +47,7 @@ function makeTTS(text, outPath, duration, voice = MAIN_VOICE) {
   execSync(`ffmpeg -y -i "${raw}" -af "apad" -t ${duration} "${safeOut}"`, { stdio: "inherit" });
 }
 
-const BASE_DIR = path.join(`${__dirname}/results/${getDate()}`);
+const BASE_DIR = getBaseDir();
 const INPUT_DIR = path.join(BASE_DIR, "images");
 const OUTPUT_DIR = path.join(BASE_DIR, "temp");
 const OUTPUT_FINAL = path.join(BASE_DIR, "output.mp4");
@@ -39,7 +56,6 @@ const FOODS_CONTENT = fs.readFileSync(FOODS_TXT, "utf-8").split("\n")
 const EDITION = FOODS_CONTENT[0].trim();
 const EDITION_EMOJI = FOODS_CONTENT[1].trim(); // TODO: Make emoji work
 
-const ENABLE_CTA = process.argv.includes("--cta");
 
 fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 

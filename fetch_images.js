@@ -4,21 +4,26 @@ const path = require("path");
 const BASE_FOLDER = path.join(__dirname, "results");
 const FOOD_FILENAME = "foods.txt";
 
+// Able to run the script for tomorrow or further
+const extraDaysArg = process.argv.indexOf("--extradays");
+let EXTRA_DAYS = extraDaysArg !== -1 ? Number(process.argv[extraDaysArg + 1]) : 0;
+if (!EXTRA_DAYS) { // Empty space returning   undefined => NaN
+  EXTRA_DAYS = 0;
+}
 
 function sleep(secs) {
   return new Promise(r => setTimeout(r, secs * 1000))
 }
 
-function getDate() {
-  // Example: 2026-05-27
-  return new Date().toISOString().split("T")[0]
-}
+function fetchFoodInfo() {
+  const date = new Date();
+  date.setDate(date.getDate() + EXTRA_DAYS);
 
-function fetchFoodInfo(date) {
-  const foodFile = path.join(BASE_FOLDER, date, FOOD_FILENAME);
+  const convertedDate = date.toISOString().split("T")[0];
+  const foodFile = path.join(BASE_FOLDER, convertedDate, FOOD_FILENAME);
 
   if (!fs.existsSync(foodFile)) {
-    console.log("File not found");
+    console.log(`File not found! Likely the directory doesn't exist:\t${convertedDate}`);
     return { foodListTitle: "", foodItems: [] }
   };
 
@@ -48,8 +53,7 @@ function generateURL(food) {
 
 
 function main() {
-  const { foodItems, foodListTitle } = fetchFoodInfo(getDate());
-  const urls = generateURLs(foodItems);
+  const { foodItems, foodListTitle } = fetchFoodInfo();
 
   const map = new Map();
 
