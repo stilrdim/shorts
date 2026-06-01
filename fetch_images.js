@@ -31,6 +31,7 @@ function fetchFoodInfo() {
 
   if (fileContent.length < 1) {
     console.log("Unable to fetch food file contents:\tFile empty");
+    console.log(`Date checked: ${convertedDate}\nFilename: ${foodFile}`);
     return { foodListTitle: "", foodItems: [] };
   }
 
