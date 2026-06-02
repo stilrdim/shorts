@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test": "node test.js",
     "1": "node initialize.js",
     "init": "node initialize.js",
     "initialize": "node initialize.js",
