@@ -47,6 +47,14 @@ function makeTTS(text, outPath, duration, voice = MAIN_VOICE) {
   execSync(`ffmpeg -y -i "${raw}" -af "apad" -t ${duration} "${safeOut}"`, { stdio: "inherit" });
 }
 
+function findVidNumber() {
+  const contents = fs.readdirSync(BASE_DIR, { recursive: true });
+
+  const videos = contents.filter(file => file.includes("output.mp4"));
+
+  return videos.length + 1;
+}
+
 const BASE_DIR = getBaseDir();
 const INPUT_DIR = path.join(BASE_DIR, "images");
 const OUTPUT_DIR = path.join(BASE_DIR, "temp");
