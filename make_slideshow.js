@@ -9,22 +9,13 @@ const SECONDARY_VOICE = "en-US-EricNeural";
 // Process args
 // Toggle CTA for engagement bait   (targeted at TikTok)
 const ENABLE_CTA = process.argv.includes("--cta");
+const DISABLE_SHUFFLE = process.argv.includes("--noshuffle");
 
 // Able to run the script for tomorrow or further
 const extraDaysArg = process.argv.indexOf("--extradays");
 let EXTRA_DAYS = extraDaysArg !== -1 ? Number(process.argv[extraDaysArg + 1]) : 0;
 if (!EXTRA_DAYS) { // Empty space returning   undefined => NaN
   EXTRA_DAYS = 0;
-}
-
-function getBaseDir() {
-  const date = new Date();
-
-  date.setDate(date.getDate() + EXTRA_DAYS);
-
-  const convertedDate = date.toISOString().split("T")[0];
-
-  return path.join(`${__dirname}/results/${convertedDate}`)
 }
 
 function shuffle(arr) {
@@ -47,23 +38,35 @@ function makeTTS(text, outPath, duration, voice = MAIN_VOICE) {
   execSync(`ffmpeg -y -i "${raw}" -af "apad" -t ${duration} "${safeOut}"`, { stdio: "inherit" });
 }
 
-function findVidNumber() {
-  const contents = fs.readdirSync(BASE_DIR, { recursive: true });
+const VIDEO_DATE = getVidDate();
 
-  const videos = contents.filter(file => file.includes("output.mp4"));
-
-  return videos.length + 1;
-}
-
-const BASE_DIR = getBaseDir();
-const INPUT_DIR = path.join(BASE_DIR, "images");
-const OUTPUT_DIR = path.join(BASE_DIR, "temp");
-const OUTPUT_FINAL = path.join(BASE_DIR, "output.mp4");
-const FOODS_TXT = path.join(BASE_DIR, "foods.txt");
+const BASE_DIR = path.join(__dirname, "results");
+const VIDEO_DIR = path.join(BASE_DIR, VIDEO_DATE);
+const INPUT_DIR = path.join(VIDEO_DIR, "images");
+const OUTPUT_DIR = path.join(VIDEO_DIR, "temp");
+const OUTPUT_FINAL = path.join(VIDEO_DIR, "output.mp4");
+const FOODS_TXT = path.join(VIDEO_DIR, "foods.txt");
 const FOODS_CONTENT = fs.readFileSync(FOODS_TXT, "utf-8").split("\n")
 const EDITION = FOODS_CONTENT[0].trim();
 const EDITION_EMOJI = FOODS_CONTENT[1].trim(); // TODO: Make emoji work
 
+function getVidDate() {
+  const date = new Date();
+
+  date.setDate(date.getDate() + EXTRA_DAYS);
+
+  const convertedDate = date.toISOString().split("T")[0];
+
+  return convertedDate
+}
+
+function getVidNumber(directory, date) {
+  const allFiles = fs.readdirSync(directory, { recursive: true });
+
+  const videos = allFiles.filter(file => file.includes("output.mp4") && !file.includes(date));
+
+  return videos.length + 1;
+}
 
 fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
@@ -77,11 +80,11 @@ for (const f of avifs) {
   fs.unlinkSync(path.join(INPUT_DIR, f));
 }
 
-const images = shuffle(
-  fs.readdirSync(INPUT_DIR)
-    .filter(f => /\.(png|webp|jpg|jpeg)$/i.test(f))
-    .map(f => path.join(INPUT_DIR, f))
-)
+const getImages = fs.readdirSync(INPUT_DIR)
+  .filter(f => /\.(png|webp|jpg|jpeg)$/i.test(f))
+  .map(f => path.join(INPUT_DIR, f))
+
+const images = DISABLE_SHUFFLE ? getImages : shuffle(getImages)
 
 console.log("Images found:", images.length);
 console.log("Edition:", EDITION);
@@ -112,6 +115,7 @@ function makeIntro(outPath, duration = 5) {
   const safeOut = outPath.replace(/\\/g, "/");
   const line1 = "EAT or PASS";
   const line2 = escapeText(`${EDITION} Edition`); // TODO: Make emoji work
+  const videoNumber = getVidNumber(BASE_DIR, VIDEO_DATE);
   const picks = pickRandom(images, 4).map(p => p.replace(/\\/g, "/"));
   const audioOut = outPath.replace(".mp4", ".mp3").replace(/\\/g, "/");
 
@@ -134,7 +138,8 @@ function makeIntro(outPath, duration = 5) {
     `[f0][c1]overlay=${corners[1].x}:${corners[1].y}[f1]`,
     `[f1][c2]overlay=${corners[2].x}:${corners[2].y}[f2]`,
     `[f2][c3]overlay=${corners[3].x}:${corners[3].y}[f3]`,
-    `[f3]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='${line1}':fontcolor=black:fontsize=120:x=(w-text_w)/2:y=(h/2)-120[t1]`,
+    `[f3]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='#${videoNumber}':fontcolor=black:fontsize=160:x=(w-text_w)/2:y=120[t0]`,
+    `[t0]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='${line1}':fontcolor=black:fontsize=120:x=(w-text_w)/2:y=(h/2)-120[t1]`,
     `[t1]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='${line2}':fontcolor=#888888:fontsize=70:x=(w-text_w)/2:y=(h/2)+20[out]`
   ].join(";");
 
@@ -210,7 +215,7 @@ function makeClip(imagePath, text, outPath, voice = MAIN_VOICE) {
 function makeCTA(foodName, outPath, duration = 5) {
   const safeOut = outPath.replace(/\\/g, "/");
   const audioOut = outPath.replace(".mp4", ".mp3").replace(/\\/g, "/");
-  const shareImg = path.join(__dirname, "results/assets/tiktok_share.png").replace(/\\/g, "/");
+  const shareImg = path.join(BASE_DIR, "assets", "icons", "tiktok_share.png").replace(/\\/g, "/");
 
   const safe = foodName.toLowerCase().replace(/ /g, "_");
   const candidates = [1, 2, 3]
@@ -261,7 +266,7 @@ function makeOutro(outPath, duration = 5) {
   const safeOut = outPath.replace(/\\/g, "/");
   const audioOut = outPath.replace(".mp4", ".mp3").replace(/\\/g, "/");
 
-  makeTTS(`Share your results in the comments and follow for more content like this`, audioOut, duration);
+  makeTTS(`Comment your results and follow for more content like this`, audioOut, duration);
 
   const filters = [
     "[0:v]format=rgba[bg]",
@@ -286,16 +291,20 @@ function makeOutro(outPath, duration = 5) {
 
 // ── main ──────────────────────────────────────────────────
 const introOut = path.join(OUTPUT_DIR, "clip_intro.mp4");
-const thumbOut = path.join(BASE_DIR, "thumbnail.jpg");
-makeIntro(introOut);
+const thumbOut = path.join(VIDEO_DIR, "thumbnail.jpg");
+makeIntro(introOut, 4);
 makeThumbnail(introOut, thumbOut);
 
 const clips = [introOut];
 
 const shownFoods = [];
 
-// Pick a random image to change the voice for;   Ensure it's not first and not in the last 3
-const randomImageIndex = 1 + Math.floor(Math.random() * (images.length - 4));
+// Ensure the random slide we'll pick is between the first X amount and the last X amount
+const amountToIgnoreBefore = 1 // Example: 1;       15 slides, 2-15 are valid
+const amounttoIgnoreAfter = 3 //  Example: 3;       15 slides, 1-12 are valid
+//                                Example: 2, 4;    15 slides, 3-11 are valid                 
+// Pick a random image to change the voice for
+const randomImageIndex = amountToIgnoreBefore + Math.floor(Math.random() * (images.length - (amounttoIgnoreAfter + 1)));
 
 images.forEach((img, i) => {
   const name = path.basename(img)
@@ -319,7 +328,7 @@ images.forEach((img, i) => {
 });
 
 const outroOut = path.join(OUTPUT_DIR, "clip_outro.mp4");
-makeOutro(outroOut, 6);
+makeOutro(outroOut, 5);
 clips.push(outroOut);
 
 console.log("\n=== CONCATENATING ===");
@@ -334,7 +343,7 @@ execSync(
 );
 
 console.log("\nDONE:", OUTPUT_FINAL);
-console.log(`\n\n\nDifferent voice on slide ${randomImageIndex} (${path.basename(images[randomImageIndex])})`)
+console.log(`\n\n\nDifferent voice on slide #${randomImageIndex + 1} (${path.basename(images[randomImageIndex])})`)
 console.log("\nUpload to\nhttps://studio.youtube.com/channel/UCAaRyww02jzv6SNlK2tqJ9Q\nhttps://www.tiktok.com/tiktokstudio/content")
 console.log(`\nDescription:\nEat or pass - ${EDITION.toLowerCase()} edition`)
 console.log(`\nHashtags:\n#eat #eatorpass #game #foodlover #pickyeater`)
