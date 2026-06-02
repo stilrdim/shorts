@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const BASE_FOLDER = path.join(__dirname, "results");
+const BASE_DIR = path.join(__dirname, "results");
 const FOOD_FILENAME = "foods.txt";
 
 // Able to run the script for tomorrow or further
@@ -20,7 +20,7 @@ function fetchFoodInfo() {
   date.setDate(date.getDate() + EXTRA_DAYS);
 
   const convertedDate = date.toISOString().split("T")[0];
-  const foodFile = path.join(BASE_FOLDER, convertedDate, FOOD_FILENAME);
+  const foodFile = path.join(BASE_DIR, convertedDate, FOOD_FILENAME);
 
   if (!fs.existsSync(foodFile)) {
     console.log(`File not found! Likely the directory doesn't exist:\t${convertedDate}`);
