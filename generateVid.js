@@ -138,7 +138,7 @@ function makeIntro(outPath, duration = 5) {
     `[f0][c1]overlay=${corners[1].x}:${corners[1].y}[f1]`,
     `[f1][c2]overlay=${corners[2].x}:${corners[2].y}[f2]`,
     `[f2][c3]overlay=${corners[3].x}:${corners[3].y}[f3]`,
-    `[f3]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='#${videoNumber}':fontcolor=black:fontsize=160:x=(w-text_w)/2:y=120[t0]`,
+    `[f3]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='#${videoNumber}':fontcolor=black:fontsize=160:x=(w-text_w)/2:y=200[t0]`,
     `[t0]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='${line1}':fontcolor=black:fontsize=120:x=(w-text_w)/2:y=(h/2)-120[t1]`,
     `[t1]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='${line2}':fontcolor=#888888:fontsize=70:x=(w-text_w)/2:y=(h/2)+20[out]`
   ].join(";");
