@@ -15,6 +15,8 @@ const FOOD_FILENAME = "foods.txt";
 const ASSETS_FOODS_DIR = path.join(BASE_DIR, "assets", "foods");
 const VID_DATE = getVidDate();
 const VID_DIR = path.join(BASE_DIR, VID_DATE);
+const IMAGES_DIR = path.join(VID_DIR, "images")
+
 
 // Food items that we need to actually look up
 const missingFoodImages = [];
@@ -101,8 +103,6 @@ function fetchImages(foodList) {
 }
 
 function populateImages(imagesList) {
-  const IMAGES_DIR = path.join(VID_DIR, "images")
-
   imagesList.forEach(img => {
     const filename = path.basename(img);
     const targetDir = path.join(IMAGES_DIR, filename)
