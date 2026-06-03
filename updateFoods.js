@@ -2,7 +2,7 @@ const path = require("path");
 const fs = require("fs");
 
 
-const OVERWRITE_FILES = false;
+const OVERWRITE_FILES = process.argv.includes("--overwrite");
 
 const todaysDate = new Date().toISOString().split("T")[0];
 
@@ -39,20 +39,6 @@ function getUniqueFoods(directory) {
   return uniqueFoods;
 }
 
-/*
-TODO: Fetch the unique foods and send them to assets/foods
-
-  Then, after the initial set up, in step #2, check assets/foods for existing photos,
-if there are, move them to the current daily /images/ folder and only generate Google Search URLs
-for the ones that haven't been found yet.
-Multpile matches with different extensions should be picked at random.
-
-  Then, on step #3 generate vid with the images as usual, then try to send the images to
-assets/foods without replacing old ones, so essentially only the new ones get added.
-
-  Alternatively, create an updater to manually run every now and then after a few videos with
-npm run update, which will recheck all food images overall and send them to assets / foods
- */
 function moveUniqueFoods(directory, foods) {
   const movedFiles = []
   const existingFiles = new Map();
@@ -97,3 +83,20 @@ function main() {
 }
 
 main();
+
+/*  Initial theory        (Went with the alternative manual updating for now)
+ 
+
+  Fetch the unique foods and send them to assets/foods
+
+  Then, after the initial set up, in step #2, check assets/foods for existing photos,
+if there are, move them to the current daily /images/ folder and only generate Google Search URLs
+for the ones that haven't been found yet.
+Multpile matches with different extensions should be picked at random.
+
+  Then, on step #3 generate vid with the images as usual, then try to send the images to
+assets/foods without replacing old ones, so essentially only the new ones get added.
+
+  Alternatively, create an updater to manually run every now and then after a few videos with
+npm run update, which will recheck all food images overall and send them to assets / foods
+ */

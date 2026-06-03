@@ -20,7 +20,8 @@
     "pipeline:build": "node generateVid.js",
     "pipeline:buildcta": "node generateVid.js --cta",
     "update": "node updateFoods.js",
-    "updateFoods": "node updateFoods.js"
+    "updateFoods": "node updateFoods.js",
+    "updateOverwrite": "node updateFoods.js --overwrite"
   },
   "keywords": [],
   "author": "",

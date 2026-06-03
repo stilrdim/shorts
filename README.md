@@ -14,7 +14,7 @@
 9. Go to **[TikTok Studio](https://www.tiktok.com/tiktokstudio/upload?from=creator_center&tab=video)** or **[Youtube Upload](https://studio.youtube.com/channel/UCAaRyww02jzv6SNlK2tqJ9Q)**
 10. Upload your `output.mp4` and add description + hashtags
 
-- Populate your current existing images _(from all `date/images` folders)_ automatically into `results/assets/foods` with `npm run update` or `node updateFoods.js`
+- Populate your current existing images _(from all `date/images` folders)_ automatically into `results/assets/foods` with `npm run update` or `node updateFoods.js`. There's also a flag for `--overwrite` or `npm run updateOverwrite` if you'd like to replace the files if they already exist.
 
 ### \* Applies for `fetchImages` and `generateVid` (step **2** and **3**)
 
