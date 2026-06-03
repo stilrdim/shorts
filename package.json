@@ -18,7 +18,9 @@
     "pipeline:init": "node initialize.js",
     "pipeline:fetch": "node fetch_images.js",
     "pipeline:build": "node make_slideshow.js",
-    "pipeline:buildcta": "node make_slideshow.js --cta"
+    "pipeline:buildcta": "node make_slideshow.js --cta",
+    "update": "node updateFoods.js",
+    "updateFoods": "node updateFoods.js"
   },
   "keywords": [],
   "author": "",
