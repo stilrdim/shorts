@@ -68,6 +68,24 @@ function getVidNumber(directory, date) {
   return videos.length + 1;
 }
 
+function estimateTextWidth(text, fontSize = 96) {
+  const ratios = {
+    narrow: 0.35,  // i, l, 1, |, :, ;, .
+    wide: 0.75,    // m, w, M, W
+    normal: 0.55,  // everything else
+  };
+  const narrow = new Set(['i', 'l', '1', '|', ':', ';', '.', ',', '!', '(', ')', '/']);
+  const wide = new Set(['m', 'w', 'M', 'W']);
+  let width = 0;
+  for (const char of text) {
+    if (narrow.has(char)) width += fontSize * ratios.narrow;
+    else if (wide.has(char)) width += fontSize * ratios.wide;
+    else width += fontSize * ratios.normal;
+  }
+  return Math.floor(width);
+}
+
+
 fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
 // Convert any AVIF images to PNG before processing
@@ -176,13 +194,12 @@ function makeClip(imagePath, text, outPath, voice = MAIN_VOICE) {
   // pre-calculate x offset based on full text width isn't possible in ffmpeg
   // so instead: left-align from a fixed start x, calculated to center the full word
   // we estimate character width at fontsize 96 ≈ 45px per char average
-  const avgCharWidth = 46;
-  const estimatedFullWidth = text.length * avgCharWidth;
+  const estimatedFullWidth = estimateTextWidth(text);
   const startX = Math.floor((1080 - estimatedFullWidth) / 2);
 
   const charFilters = [];
   for (let i = 1; i <= text.length; i++) {
-    const substr = escapeText(text.slice(0, i));
+    const substr = escapeText(text.slice(0, i)).toUpperCase();
     const startT = ((i - 1) * charDelay).toFixed(2);
     const endT = i < text.length ? (i * charDelay).toFixed(2) : duration;
     const inLabel = i === 1 ? "base" : `ct${i - 1}`;
@@ -194,17 +211,17 @@ function makeClip(imagePath, text, outPath, voice = MAIN_VOICE) {
 
   const vf = [
     "color=c=white:s=1080x1920:d=3[bg]",
-    "[0:v]format=rgba,scale=750:750:force_original_aspect_ratio=decrease[img]",
+    "[0:v]format=rgba,scale=750:750:force_original_aspect_ratio=decrease,loop=loop=-1:size=1[img]",
     "[bg][img]overlay=(W-w)/2:(H-h)/2-60[base]",
     ...charFilters
   ].join(";");
 
   const cmd = [
     "ffmpeg -y",
-    `-loop 1 -t ${duration} -i "${safeImage}"`,
+    `-t ${duration} -i "${safeImage}"`,
     `-i "${audioOut}"`,
-    `-vf "${vf}"`,
-    `-map 0:v -map 1:a`,
+    `-filter_complex "${vf}"`,
+    `-map "[out]" -map 1:a`,
     `-t ${duration} -r 30 -c:v libx264 -pix_fmt yuv420p -c:a aac -b:a 128k "${safeOut}"`
   ].join(" ");
 
