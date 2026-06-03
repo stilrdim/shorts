@@ -1,8 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 
-const BASE_DIR = path.join(__dirname, "results");
-const FOOD_FILENAME = "foods.txt";
 
 // Able to run the script for tomorrow or further
 const extraDaysArg = process.argv.indexOf("--extradays");
@@ -11,16 +9,30 @@ if (!EXTRA_DAYS) { // Empty space returning   undefined => NaN
   EXTRA_DAYS = 0;
 }
 
+
+const BASE_DIR = path.join(__dirname, "results");
+const FOOD_FILENAME = "foods.txt";
+const ASSETS_FOODS_DIR = path.join(BASE_DIR, "assets", "foods");
+const VID_DATE = getVidDate();
+const VID_DIR = path.join(BASE_DIR, VID_DATE);
+
+
+function getVidDate() {
+  const date = new Date();
+
+  date.setDate(date.getDate() + EXTRA_DAYS);
+
+  const convertedDate = date.toISOString().split("T")[0];
+
+  return convertedDate
+}
+
 function sleep(secs) {
   return new Promise(r => setTimeout(r, secs * 1000))
 }
 
 function fetchFoodInfo() {
-  const date = new Date();
-  date.setDate(date.getDate() + EXTRA_DAYS);
-
-  const convertedDate = date.toISOString().split("T")[0];
-  const foodFile = path.join(BASE_DIR, convertedDate, FOOD_FILENAME);
+  const foodFile = path.join(VID_DIR, FOOD_FILENAME);
 
   if (!fs.existsSync(foodFile)) {
     console.log(`File not found! Likely the directory doesn't exist:\t${convertedDate}`);
