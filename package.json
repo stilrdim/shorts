@@ -4,14 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js",
     "1": "node initialize.js",
+    "2": "node fetchImages.js",
+    "3": "node generateVid.js",
+    "test": "node test.js",
     "init": "node initialize.js",
     "initialize": "node initialize.js",
-    "2": "node fetchImages.js",
     "fetch": "node fetchImages.js",
     "fetchextra": "node fetchImages.js --extradays",
-    "3": "node generateVid.js",
     "3c": "node generateVid.js --cta",
     "generate": "node generateVid.js",
     "generatecta": "node generateVid.js --cta",
@@ -26,5 +26,8 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "dependencies": {
+    "sharp": "^0.34.5"
+  }
 }
