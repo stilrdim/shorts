@@ -140,10 +140,10 @@ function makeIntro(outPath, duration = 5) {
   makeTTS(`Eat or Pass. ${EDITION} Edition`, audioOut, duration);
 
   const corners = [
-    { x: 125, y: 400 },
-    { x: 1080 - 300 - 225, y: 400 },
-    { x: 125, y: 1920 - 300 - 400 },
-    { x: 1080 - 300 - 225, y: 1920 - 300 - 400 },
+    { x: 125, y: 490 },
+    { x: 1080 - 300 - 225, y: 490 },
+    { x: 125, y: 1920 - 300 - 400 + 30 },
+    { x: 1080 - 300 - 225, y: 1920 - 300 - 400 + 30 },
   ];
 
   const filters = [
@@ -156,9 +156,9 @@ function makeIntro(outPath, duration = 5) {
     `[f0][c1]overlay=${corners[1].x}:${corners[1].y}[f1]`,
     `[f1][c2]overlay=${corners[2].x}:${corners[2].y}[f2]`,
     `[f2][c3]overlay=${corners[3].x}:${corners[3].y}[f3]`,
-    `[f3]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='#${videoNumber}':fontcolor=black:fontsize=160:x=(w-text_w)/2:y=200[t0]`,
-    `[t0]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='${line1}':fontcolor=black:fontsize=120:x=(w-text_w)/2:y=(h/2)-120[t1]`,
-    `[t1]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='${line2}':fontcolor=#888888:fontsize=70:x=(w-text_w)/2:y=(h/2)+20[out]`
+    `[f3]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='#${videoNumber}':fontcolor=black:fontsize=160:x=(w-text_w)/2:y=290[t0]`,
+    `[t0]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='${line1}':fontcolor=black:fontsize=120:x=(w-text_w)/2:y=(h/2)-30[t1]`,
+    `[t1]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='${line2}':fontcolor=#888888:fontsize=70:x=(w-text_w)/2:y=(h/2)+110[out]`,
   ].join(";");
 
   const cmd = [
