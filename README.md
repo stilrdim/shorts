@@ -5,15 +5,24 @@
 1. Run `node initialize.js` or `npm run 1` / `npm run init` to create a new folder inside `results/` for each of the next 7 days
 2. Generate 15 food items (with AI)
 3. First line in `foods.txt` is `EDITION_NAME` (Ex. `Picky Eater`), second line is emoji if needed
-4. Food items are on the remaining lines (3-17)
-5. Run `node fetch_images.js` or `npm run 2` / `npm run fetch`
-   > Use `node fetch_images.js --extraday 1` to check tomorrow's list or `npm run fetchextra 1` for **positives** _(tomorrow)_ and `npm run fetchextra -- -1` for **negatives** _(yesterday)_
+4. Food items are on the remaining lines **(3-17)**
+5. Run `node fetchImages.js` or `npm run 2` / `npm run fetch` \*
 6. Use your terminal `CTRL + CLICK` to manually find images through Google Images
 7. Save images into folder `YYYY-MM-DD/images` titled by food name + extension (Ex. `Balut_Egg.png`). Supports `png` `webp` `jpg` `jpeg` (`avif` will be converted to `png`)
-8. Run `node make_slideshow.js` or `npm run 3` / `npm run generate`
-   > or `npm run 3c` `npm run generatecta` if you want to include a slide for engagement bait, type **Never eat x again or marry your first @**
-9. Go to **[TikTok Studio](https://www.tiktok.com/tiktokstudio/upload?from=creator_center&tab=video)**
+8. Run `node generateVid.js` or `npm run 3` / `npm run generate` \*
+   > or `npm run 3c` / `npm run generatecta` if you want to include a slide for engagement bait, type **Never eat x again or marry your first @**
+9. Go to **[TikTok Studio](https://www.tiktok.com/tiktokstudio/upload?from=creator_center&tab=video)** or **[Youtube Upload](https://studio.youtube.com/channel/UCAaRyww02jzv6SNlK2tqJ9Q)**
 10. Upload your `output.mp4` and add description + hashtags
+
+- Populate your current existing images _(from all `date/images` folders)_ automatically into `results/assets/foods` with `npm run update` or `node updateFoods.js`
+
+### \* Applies for `fetchImages` and `generateVid` (step **2** and **3**)
+
+> Use `node fetchImages.js --extraday 1` to check tomorrow's list
+
+> `npm run fetchextra -- 1` for **positives** _(tomorrow)_
+
+> `npm run fetchextra -- -1` for **negatives** _(yesterday)_
 
 ### Example description
 
