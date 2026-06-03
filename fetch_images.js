@@ -16,6 +16,9 @@ const ASSETS_FOODS_DIR = path.join(BASE_DIR, "assets", "foods");
 const VID_DATE = getVidDate();
 const VID_DIR = path.join(BASE_DIR, VID_DATE);
 
+// Food items that we need to actually look up
+const missingFoodImages = [];
+
 
 function getVidDate() {
   const date = new Date();
@@ -64,18 +67,69 @@ function generateURL(food) {
   return `https://www.google.com/search?q=${encodeURIComponent(food)}&tbm=isch&tbs=ic:trans`;
 }
 
+function normalizeStr(str) {
+  return str.replaceAll("_", " ").toLowerCase().trim().split(".")[0];
+}
+
+function normalizeList(foodList) {
+  return foodList.map(food => {
+    return normalizeStr(food);
+  })
+}
+
+function fetchImages(foodList) {
+  // Fetch all images and map them to normalized food names
+  const allImages = fs.readdirSync(ASSETS_FOODS_DIR, { recursive: false, encoding: "utf-8" });
+
+  const images = new Map();
+  allImages.forEach(f => images.set(normalizeStr(f), f))
+
+  // Return the existing and non-existing ones separately
+  const foods = normalizeList(foodList);
+
+  const existing = foods
+    .map(food => {
+      if (images.get(food) === undefined) {
+        missingFoodImages.push(food)
+        return undefined;
+      }
+
+      return path.join(ASSETS_FOODS_DIR, images.get(food));
+    })
+
+  return existing.filter(f => f !== undefined)
+}
+
+function populateImages(imagesList) {
+  const IMAGES_DIR = path.join(VID_DIR, "images")
+
+  imagesList.forEach(img => {
+    const filename = path.basename(img);
+    const targetDir = path.join(IMAGES_DIR, filename)
+
+    fs.copyFileSync(img, targetDir)
+
+    console.log(`Added image for ${filename.split(".")[0]}`)
+  })
+}
+
 
 function main() {
   const { foodItems, foodListTitle } = fetchFoodInfo();
 
-  const map = new Map();
+  const images = fetchImages(foodItems);
 
-  for (const food of foodItems) {
-    map.set(food, generateURL(food));
+  populateImages(images);
+
+
+  const foodToUrlMap = new Map();
+
+  for (const food of missingFoodImages) {
+    foodToUrlMap.set(food, generateURL(food));
   }
 
   console.log(foodListTitle, "\n");
-  console.log(map);
+  console.log(foodToUrlMap);
   console.log("\n", foodItems.join(", "));
 }
 
