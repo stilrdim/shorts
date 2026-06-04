@@ -16,6 +16,9 @@
 
 - Populate your current existing images _(from all `date/images` folders)_ automatically into `results/assets/foods` with `npm run update` or `node updateFoods.js`. There's also a flag for `--overwrite` or `npm run updateOverwrite` if you'd like to replace the files if they already exist.
 
+- Trim all images with `npm run trim` or `node trimImages.js`. Target location is `./results/assets/foods/`.
+  > This is already done automatically for your current `date/images` folder whenever you use `generateVid` (step **3**)
+
 ### \* Applies for `fetchImages` and `generateVid` (step **2** and **3**)
 
 > Use `node fetchImages.js --extraday 1` to check tomorrow's list
