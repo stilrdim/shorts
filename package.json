@@ -23,7 +23,8 @@
     "updateFoods": "node updateFoods.js",
     "updateOverwrite": "node updateFoods.js --overwrite",
     "trim": "node trimImages.js",
-    "trimImages": "node trimImages.js"
+    "trimImages": "node trimImages.js",
+    "trimDownloads": "node trimImages.js --downloads"
   },
   "keywords": [],
   "author": "",

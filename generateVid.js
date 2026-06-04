@@ -143,13 +143,30 @@ function makeThumbnail(introPath, outPath) {
 
 function makeIntro(outPath, images, duration = 5) {
   const safeOut = outPath.replace(/\\/g, "/");
-  const line1 = "EAT or PASS";
-  const line2 = escapeText(`${EDITION} Edition`); // TODO: Make emoji work
+  const line2 = escapeText(`${EDITION.toUpperCase()} EDITION`);
   const videoNumber = getVidNumber(BASE_DIR, VIDEO_DATE);
   const picks = pickRandom(images, 4).map(p => p.replace(/\\/g, "/"));
   const audioOut = outPath.replace(".mp4", ".mp3").replace(/\\/g, "/");
-
   makeTTS(`Eat or Pass. ${EDITION} Edition`, audioOut, duration);
+
+  const font = `C\\\\:/Windows/Fonts/bahnschrift.ttf`;
+  const centerY = `(h/2)`;
+
+  // Word widths estimated for centering the full "EAT or PASS" line
+  const eatW = estimateTextWidth("EAT", 120);
+  const orW = estimateTextWidth("OR", 70);
+  const passW = estimateTextWidth("PASS", 120);
+  const gap = 48;
+  const totalW = eatW + gap + orW + gap + passW;
+  const lineStartX = Math.floor((1080 - totalW) / 2);
+  const orX = lineStartX + eatW + gap;
+  const passX = orX + orW + gap;
+  const colorPastelGreen = "#6DBF8A";
+  const colorPastelRed = "#E8786A";
+  const colorLightGrey = "#CCCCCC";
+  const colorDarkGrey = "#AAAAAA";
+  const colorVeryDarkGrey = "#333333"
+  const colorBlack = "#111111"
 
   const corners = [
     { x: 125, y: 490 },
@@ -168,9 +185,16 @@ function makeIntro(outPath, images, duration = 5) {
     `[f0][c1]overlay=${corners[1].x}:${corners[1].y}[f1]`,
     `[f1][c2]overlay=${corners[2].x}:${corners[2].y}[f2]`,
     `[f2][c3]overlay=${corners[3].x}:${corners[3].y}[f3]`,
-    `[f3]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='#${videoNumber}':fontcolor=black:fontsize=160:x=(w-text_w)/2:y=290[t0]`,
-    `[t0]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='${line1}':fontcolor=black:fontsize=120:x=(w-text_w)/2:y=(h/2)-30[t1]`,
-    `[t1]drawtext=fontfile=C\\\\:/Windows/Fonts/bahnschrift.ttf:text='${line2}':fontcolor=#888888:fontsize=70:x=(w-text_w)/2:y=(h/2)+110[out]`,
+    // Video number
+    `[f3]drawtext=fontfile=${font}:text='#${videoNumber}':fontcolor=${colorDarkGrey}:fontsize=100:x=(w-text_w)/2:y=290[t0]`,
+    // EAT
+    `[t0]drawtext=fontfile=${font}:text='EAT':fontcolor=${colorBlack}:fontsize=120:x=${lineStartX}:y=${centerY}-30[t1]`,
+    // OR
+    `[t1]drawtext=fontfile=${font}:text='OR':fontcolor=${colorVeryDarkGrey}:fontsize=70:x=${orX}:y=${centerY}-10[t2]`,
+    // PASS
+    `[t2]drawtext=fontfile=${font}:text='PASS':fontcolor=${colorBlack}:fontsize=120:x=${passX}:y=${centerY}-30[t3]`,
+    // EDITION line
+    `[t3]drawtext=fontfile=${font}:text='${line2}':fontcolor=${colorDarkGrey}:fontsize=65:x=(w-text_w)/2:y=${centerY}+110[out]`,
   ].join(";");
 
   const cmd = [
