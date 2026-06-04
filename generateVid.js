@@ -1,12 +1,16 @@
 const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
+const sharp = require("sharp");
+
+// SHARP CONFIG
+sharp.cache(false)
 
 // Voices preview: https://tts.travisvn.com/
 const MAIN_VOICE = "en-US-AriaNeural";
 const SECONDARY_VOICE = "en-US-EricNeural";
 
-// Process args
+//#region Process Args
 // Toggle CTA for engagement bait   (targeted at TikTok)
 const ENABLE_CTA = process.argv.includes("--cta");
 const DISABLE_SHUFFLE = process.argv.includes("--noshuffle");
@@ -16,6 +20,46 @@ const extraDaysArg = process.argv.indexOf("--extradays");
 let EXTRA_DAYS = extraDaysArg !== -1 ? Number(process.argv[extraDaysArg + 1]) : 0;
 if (!EXTRA_DAYS) { // Empty space returning   undefined => NaN
   EXTRA_DAYS = 0;
+}
+//#endregion Process Args
+
+//#region Constants
+const VIDEO_DATE = getVidDate();
+
+const BASE_DIR = path.join(__dirname, "results");
+const VID_DIR = path.join(BASE_DIR, VIDEO_DATE);
+const VID_IMAGES_DIR = path.join(VID_DIR, "images");
+const OUTPUT_DIR = path.join(VID_DIR, "temp");
+const OUTPUT_FINAL = path.join(VID_DIR, "output.mp4");
+const ASSETS_FOODS_DIR = path.join(BASE_DIR, "assets", "foods");
+const FOODS_TXT = path.join(VID_DIR, "foods.txt");
+const FOODS_CONTENT = fs.readFileSync(FOODS_TXT, "utf-8").split("\n")
+const EDITION = FOODS_CONTENT[0].trim();
+const EDITION_EMOJI = FOODS_CONTENT[1].trim(); // TODO: Make emoji work
+//#endregion Constants
+
+//#region UTILS
+async function trimImage(imgPath) {
+  const buffer = await sharp(imgPath).trim().toBuffer();
+  fs.writeFileSync(imgPath, buffer)
+}
+
+async function trimAllImages(inputPath) {
+  let successfulTrimCount = 0;
+
+  const allImages = fs.readdirSync(inputPath, { encoding: "utf-8" })
+    .map(img => path.join(inputPath, img));
+
+  await Promise.all(
+    allImages.map(async (img) => {
+      await trimImage(img);
+
+      console.log(`Trimmed ${img}`);
+      successfulTrimCount += 1;
+    })
+  )
+
+  console.log(`\n\nSuccessfully trimmed ${successfulTrimCount}/${allImages.length} images!`);
 }
 
 function shuffle(arr) {
@@ -29,26 +73,6 @@ function shuffle(arr) {
 function pickRandom(arr, n) {
   return [...arr].sort(() => Math.random() - 0.5).slice(0, n);
 }
-
-function makeTTS(text, outPath, duration, voice = MAIN_VOICE) {
-  const safe = text.replace(/"/g, "'");
-  const raw = outPath.replace(".mp3", "_raw.mp3").replace(/\\/g, "/");
-  const safeOut = outPath.replace(/\\/g, "/");
-  execSync(`py -m edge_tts --voice ${voice} --text "${safe}" --write-media "${raw}"`, { stdio: "inherit" });
-  execSync(`ffmpeg -y -i "${raw}" -af "apad" -t ${duration} "${safeOut}"`, { stdio: "inherit" });
-}
-
-const VIDEO_DATE = getVidDate();
-
-const BASE_DIR = path.join(__dirname, "results");
-const VIDEO_DIR = path.join(BASE_DIR, VIDEO_DATE);
-const INPUT_DIR = path.join(VIDEO_DIR, "images");
-const OUTPUT_DIR = path.join(VIDEO_DIR, "temp");
-const OUTPUT_FINAL = path.join(VIDEO_DIR, "output.mp4");
-const FOODS_TXT = path.join(VIDEO_DIR, "foods.txt");
-const FOODS_CONTENT = fs.readFileSync(FOODS_TXT, "utf-8").split("\n")
-const EDITION = FOODS_CONTENT[0].trim();
-const EDITION_EMOJI = FOODS_CONTENT[1].trim(); // TODO: Make emoji work
 
 function getVidDate() {
   const date = new Date();
@@ -84,29 +108,6 @@ function estimateTextWidth(text, fontSize = 96) {
   }
   return Math.floor(width);
 }
-
-
-fs.mkdirSync(OUTPUT_DIR, { recursive: true });
-
-// Convert any AVIF images to PNG before processing
-const avifs = fs.readdirSync(INPUT_DIR).filter(f => /\.avif$/i.test(f));
-for (const f of avifs) {
-  const inPath = path.join(INPUT_DIR, f).replace(/\\/g, "/");
-  const outPath = path.join(INPUT_DIR, f.replace(/\.avif$/i, ".png")).replace(/\\/g, "/");
-  console.log(`Converting AVIF: ${f}`);
-  execSync(`ffmpeg -y -i "${inPath}" "${outPath}"`, { stdio: "inherit" });
-  fs.unlinkSync(path.join(INPUT_DIR, f));
-}
-
-const getImages = fs.readdirSync(INPUT_DIR)
-  .filter(f => /\.(png|webp|jpg|jpeg)$/i.test(f))
-  .map(f => path.join(INPUT_DIR, f))
-
-const images = DISABLE_SHUFFLE ? getImages : shuffle(getImages)
-
-console.log("Images found:", images.length);
-console.log("Edition:", EDITION);
-
 function escapeText(t) {
   return t
     .replace(/\\/g, "\\\\")
@@ -114,6 +115,17 @@ function escapeText(t) {
     .replace(/:/g, "\\:")
     .replace(/\[/g, "\\[")
     .replace(/\]/g, "\\]");
+}
+
+//#endregion UTILS
+
+//#region GENERATE SECTIONS
+function makeTTS(text, outPath, duration, voice = MAIN_VOICE) {
+  const safe = text.replace(/"/g, "'");
+  const raw = outPath.replace(".mp3", "_raw.mp3").replace(/\\/g, "/");
+  const safeOut = outPath.replace(/\\/g, "/");
+  execSync(`py -m edge_tts --voice ${voice} --text "${safe}" --write-media "${raw}"`, { stdio: "inherit" });
+  execSync(`ffmpeg -y -i "${raw}" -af "apad" -t ${duration} "${safeOut}"`, { stdio: "inherit" });
 }
 
 function makeThumbnail(introPath, outPath) {
@@ -129,7 +141,7 @@ function makeThumbnail(introPath, outPath) {
   console.log(`\nThumbnail saved → ${safeOut}`);
 }
 
-function makeIntro(outPath, duration = 5) {
+function makeIntro(outPath, images, duration = 5) {
   const safeOut = outPath.replace(/\\/g, "/");
   const line1 = "EAT or PASS";
   const line2 = escapeText(`${EDITION} Edition`); // TODO: Make emoji work
@@ -229,14 +241,14 @@ function makeClip(imagePath, text, outPath, voice = MAIN_VOICE) {
   execSync(cmd, { stdio: "inherit" });
 }
 
-function makeCTA(foodName, outPath, duration = 5) {
+function makeCTA(foodName, images, outPath, duration = 5) {
   const safeOut = outPath.replace(/\\/g, "/");
   const audioOut = outPath.replace(".mp4", ".mp3").replace(/\\/g, "/");
   const shareImg = path.join(BASE_DIR, "assets", "icons", "tiktok_share.png").replace(/\\/g, "/");
 
   const safe = foodName.toLowerCase().replace(/ /g, "_");
   const candidates = [1, 2, 3]
-    .map(n => path.join(INPUT_DIR, `${safe}_${n}.png`))
+    .map(n => path.join(VID_IMAGES_DIR, `${safe}_${n}.png`))
     .filter(fs.existsSync);
   const foodImg = candidates.length
     ? candidates[0].replace(/\\/g, "/")
@@ -305,62 +317,92 @@ function makeOutro(outPath, duration = 5) {
   console.log("\nGenerating outro...");
   execSync(cmd, { stdio: "inherit" });
 }
+//#endregion GNEERATE SECTIONS
 
-// ── main ──────────────────────────────────────────────────
-const introOut = path.join(OUTPUT_DIR, "clip_intro.mp4");
-const thumbOut = path.join(VIDEO_DIR, "thumbnail.jpg");
-makeIntro(introOut, 4);
-makeThumbnail(introOut, thumbOut);
 
-const clips = [introOut];
+//#region Main
+async function main() {
+  await trimAllImages(VID_IMAGES_DIR);
 
-const shownFoods = [];
+  fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
-// Ensure the random slide we'll pick is between the first X amount and the last X amount
-const amountToIgnoreBefore = 1 // Example: 1;       15 slides, 2-15 are valid
-const amounttoIgnoreAfter = 3 //  Example: 3;       15 slides, 1-12 are valid
-//                                Example: 2, 4;    15 slides, 3-11 are valid                 
-// Pick a random image to change the voice for
-const randomImageIndex = amountToIgnoreBefore + Math.floor(Math.random() * (images.length - (amounttoIgnoreAfter + 1)));
-
-images.forEach((img, i) => {
-  const name = path.basename(img)
-    .replace(/\.[^/.]+$/, "")
-    .replace(/_/g, " ");
-  const out = path.join(OUTPUT_DIR, `clip_${i}.mp4`);
-
-  // Change the voice of one random slide for engagement bait
-  i === randomImageIndex ? makeClip(img, name, out, SECONDARY_VOICE) : makeClip(img, name, out)
-
-  clips.push(out);
-  shownFoods.push(name);
-
-  // after 5th food (index 4), insert CTA
-  if (i === 4 && ENABLE_CTA) {
-    const ctaFood = shownFoods[Math.floor(Math.random() * shownFoods.length)];
-    const ctaOut = path.join(OUTPUT_DIR, "clip_cta.mp4");
-    makeCTA(ctaFood, ctaOut, 6);
-    clips.push(ctaOut);
+  // Convert any AVIF images to PNG before processing
+  const avifs = fs.readdirSync(VID_IMAGES_DIR).filter(f => /\.avif$/i.test(f));
+  for (const f of avifs) {
+    const inPath = path.join(VID_IMAGES_DIR, f).replace(/\\/g, "/");
+    const outPath = path.join(VID_IMAGES_DIR, f.replace(/\.avif$/i, ".png")).replace(/\\/g, "/");
+    console.log(`Converting AVIF: ${f}`);
+    execSync(`ffmpeg -y -i "${inPath}" "${outPath}"`, { stdio: "inherit" });
+    fs.unlinkSync(path.join(VID_IMAGES_DIR, f));
   }
-});
 
-const outroOut = path.join(OUTPUT_DIR, "clip_outro.mp4");
-makeOutro(outroOut, 5);
-clips.push(outroOut);
+  const getImages = fs.readdirSync(VID_IMAGES_DIR)
+    .filter(f => /\.(png|webp|jpg|jpeg)$/i.test(f))
+    .map(f => path.join(VID_IMAGES_DIR, f))
 
-console.log("\n=== CONCATENATING ===");
-const listFile = path.join(OUTPUT_DIR, "list.txt");
-fs.writeFileSync(listFile,
-  clips.map(c => `file '${c.replace(/\\/g, "/")}'`).join("\n")
-);
+  const images = DISABLE_SHUFFLE ? getImages : shuffle(getImages)
 
-execSync(
-  `ffmpeg -y -f concat -safe 0 -i "${listFile}" -c copy "${OUTPUT_FINAL}"`,
-  { stdio: "inherit" }
-);
+  console.log("Images found:", images.length);
+  console.log("Edition:", EDITION);
 
-console.log("\nDONE:", OUTPUT_FINAL);
-console.log(`\n\n\nDifferent voice on slide #${randomImageIndex + 1} (${path.basename(images[randomImageIndex])})`)
-console.log("\nUpload to\nhttps://studio.youtube.com/channel/UCAaRyww02jzv6SNlK2tqJ9Q\nhttps://www.tiktok.com/tiktokstudio/content")
-console.log(`\nDescription:\nEat or pass - ${EDITION.toLowerCase()} edition`)
-console.log(`\nHashtags:\n#eat #eatorpass #game #foodlover #pickyeater`)
+  const introOut = path.join(OUTPUT_DIR, "clip_intro.mp4");
+  const thumbOut = path.join(VID_DIR, "thumbnail.jpg");
+  makeIntro(introOut, images, 4);
+  makeThumbnail(introOut, thumbOut);
+
+  const clips = [introOut];
+
+  const shownFoods = [];
+
+  // Ensure the random slide we'll pick is between the first X amount and the last X amount
+  const amountToIgnoreBefore = 1 // Example: 1;       15 slides, 2-15 are valid
+  const amounttoIgnoreAfter = 3 //  Example: 3;       15 slides, 1-12 are valid
+  //                                Example: 2, 4;    15 slides, 3-11 are valid                 
+  // Pick a random image to change the voice for
+  const randomImageIndex = amountToIgnoreBefore + Math.floor(Math.random() * (images.length - (amounttoIgnoreAfter + 1)));
+
+  images.forEach((img, i) => {
+    const name = path.basename(img)
+      .replace(/\.[^/.]+$/, "")
+      .replace(/_/g, " ");
+    const out = path.join(OUTPUT_DIR, `clip_${i}.mp4`);
+
+    // Change the voice of one random slide for engagement bait
+    i === randomImageIndex ? makeClip(img, name, out, SECONDARY_VOICE) : makeClip(img, name, out)
+
+    clips.push(out);
+    shownFoods.push(name);
+
+    // after 5th food (index 4), insert CTA
+    if (i === 4 && ENABLE_CTA) {
+      const ctaFood = shownFoods[Math.floor(Math.random() * shownFoods.length)];
+      const ctaOut = path.join(OUTPUT_DIR, "clip_cta.mp4");
+      makeCTA(ctaFood, images, ctaOut, 6);
+      clips.push(ctaOut);
+    }
+  });
+
+  const outroOut = path.join(OUTPUT_DIR, "clip_outro.mp4");
+  makeOutro(outroOut, 5);
+  clips.push(outroOut);
+
+  console.log("\n=== CONCATENATING ===");
+  const listFile = path.join(OUTPUT_DIR, "list.txt");
+  fs.writeFileSync(listFile,
+    clips.map(c => `file '${c.replace(/\\/g, "/")}'`).join("\n")
+  );
+
+  execSync(
+    `ffmpeg -y -f concat -safe 0 -i "${listFile}" -c copy "${OUTPUT_FINAL}"`,
+    { stdio: "inherit" }
+  );
+
+  console.log("\nDONE:", OUTPUT_FINAL);
+  console.log(`\n\n\nDifferent voice on slide #${randomImageIndex + 1} (${path.basename(images[randomImageIndex])})`)
+  console.log("\nUpload to\nhttps://studio.youtube.com/channel/UCAaRyww02jzv6SNlK2tqJ9Q\nhttps://www.tiktok.com/tiktokstudio/content")
+  console.log(`\nDescription:\nEat or pass - ${EDITION.toLowerCase()} edition`)
+  console.log(`\nHashtags:\n#eat #eatorpass #game #foodlover #pickyeater`)
+}
+//#endregion Main
+
+main()
