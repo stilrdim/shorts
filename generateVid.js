@@ -186,7 +186,7 @@ function makeIntro(outPath, images, duration = 5) {
     `[f1][c2]overlay=${corners[2].x}:${corners[2].y}[f2]`,
     `[f2][c3]overlay=${corners[3].x}:${corners[3].y}[f3]`,
     // Video number
-    `[f3]drawtext=fontfile=${font}:text='#${videoNumber}':fontcolor=${colorDarkGrey}:fontsize=100:x=(w-text_w)/2:y=290[t0]`,
+    `[f3]drawtext=fontfile=${font}:text='#${videoNumber}':fontcolor=${colorVeryDarkGrey}:fontsize=100:x=(w-text_w)/2:y=290[t0]`,
     // EAT
     `[t0]drawtext=fontfile=${font}:text='EAT':fontcolor=${colorBlack}:fontsize=120:x=${lineStartX}:y=${centerY}-30[t1]`,
     // OR
@@ -342,7 +342,6 @@ function makeOutro(outPath, duration = 5) {
   execSync(cmd, { stdio: "inherit" });
 }
 //#endregion GNEERATE SECTIONS
-
 
 //#region Main
 async function main() {
