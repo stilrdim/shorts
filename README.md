@@ -17,7 +17,10 @@
 - Populate your current existing images _(from all `date/images` folders)_ automatically into `results/assets/foods` with `npm run update` or `node updateFoods.js`. There's also a flag for `--overwrite` or `npm run updateOverwrite` if you'd like to replace the files if they already exist.
 
 - Trim all images with `npm run trim` or `node trimImages.js`. Target location is `./results/assets/foods/`.
+
   > This is already done automatically for your current `date/images` folder whenever you use `generateVid` (step **3**)
+
+- If you're out of ideas and lazy to find new lists but have plenty of images in `./results/assets/foods/`, run `npm run genlist` or `node run randomFoodsGen.js` for a list of `15` foods by default (adjustable in the `FOODS_AMOUNT` constant at the top).
 
 ### \* Applies for `fetchImages` and `generateVid` (step **2** and **3**)
 

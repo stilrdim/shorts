@@ -24,7 +24,8 @@
     "updateOverwrite": "node updateFoods.js --overwrite",
     "trim": "node trimImages.js",
     "trimImages": "node trimImages.js",
-    "trimDownloads": "node trimImages.js --downloads"
+    "trimDownloads": "node trimImages.js --downloads",
+    "genlist": "node randomFoodsGen.js"
   },
   "keywords": [],
   "author": "",
