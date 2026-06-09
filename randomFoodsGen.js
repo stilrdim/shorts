@@ -20,12 +20,12 @@ function generateList(desiredFoodsAmount) {
 
   const allFoods = allImages.map(file => file.replaceAll("_", " ").split(".")[0].trim());
 
-  const generatedFoodList = []
+  const generatedFoodList = new Set();
 
-  for (let i = 0; i < desiredFoodsAmount; i++) {
+  while (generatedFoodList.size < desiredFoodsAmount) {
     const randomFood = getRandomFood(allFoods);
 
-    generatedFoodList.push(randomFood);
+    generatedFoodList.add(randomFood);
   }
 
   return generatedFoodList;

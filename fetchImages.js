@@ -40,7 +40,7 @@ function fetchFoodInfo() {
   const foodFile = path.join(VID_DIR, FOOD_FILENAME);
 
   if (!fs.existsSync(foodFile)) {
-    console.log(`File not found! Likely the directory doesn't exist:\t${convertedDate}`);
+    console.log(`File not found! Likely the directory doesn't exist:\t${VID_DATE}`);
     return { foodListTitle: "", foodItems: [] }
   };
 
@@ -48,7 +48,7 @@ function fetchFoodInfo() {
 
   if (fileContent.length < 1) {
     console.log("Unable to fetch food file contents:\tFile empty");
-    console.log(`Date checked: ${convertedDate}\nFilename: ${foodFile}`);
+    console.log(`Date checked: ${VID_DATE}\nFilename: ${foodFile}`);
     return { foodListTitle: "", foodItems: [] };
   }
 
@@ -70,7 +70,11 @@ function generateURL(food) {
 }
 
 function normalizeStr(str) {
-  return str.replaceAll("_", " ").toLowerCase().trim().split(".")[0];
+  return str.toLowerCase()
+    .split(".")[0] // Grab name without extension(s)
+    .replace(/[_-]/g, " ") // Format _ and - to spaces
+    .replace(/\d+$/g, "") // Remove numbers
+    .trim();
 }
 
 function normalizeList(foodList) {
@@ -79,30 +83,49 @@ function normalizeList(foodList) {
   })
 }
 
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
 function fetchImages(foodList) {
   // Fetch all images and map them to normalized food names
   const allImages = fs.readdirSync(ASSETS_FOODS_DIR, { recursive: false, encoding: "utf-8" });
 
   const images = new Map();
-  allImages.forEach(f => images.set(normalizeStr(f), f))
+  // allImages.forEach(f => images.set(normalizeStr(f), f))
+
+  allImages.forEach(f => {
+    const key = normalizeStr(f);
+
+    if (!images.has(key)) images.set(key, []);
+    images.get(key).push(f);
+  })
 
   // Return the existing and non-existing ones separately
   const foods = normalizeList(foodList);
 
   const existing = foods
     .map(food => {
-      if (images.get(food) === undefined) {
-        missingFoodImages.push(food)
+      const imgs = images.get(food);
+
+      if (!imgs) {
+        missingFoodImages.push(food);
         return undefined;
       }
 
-      return path.join(ASSETS_FOODS_DIR, images.get(food));
+      const randomImg = pickRandom(imgs);
+      return path.join(ASSETS_FOODS_DIR, randomImg);
     })
+    .filter(Boolean);
 
-  return existing.filter(f => f !== undefined)
+  return existing;
 }
 
 function populateImages(imagesList) {
+  if (!fs.existsSync(IMAGES_DIR)) {
+    fs.mkdirSync(IMAGES_DIR, { recursive: true });
+  }
+
   imagesList.forEach(img => {
     const filename = path.basename(img);
     const targetDir = path.join(IMAGES_DIR, filename)
