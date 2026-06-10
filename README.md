@@ -14,11 +14,11 @@
 9. Go to **[TikTok Studio](https://www.tiktok.com/tiktokstudio/upload?from=creator_center&tab=video)** or **[Youtube Upload](https://studio.youtube.com/channel/UCAaRyww02jzv6SNlK2tqJ9Q)**
 10. Upload your `output.mp4` and add description + hashtags
 
-- Populate your current existing images _(from all `date/images` folders)_ automatically into `results/assets/foods` with `npm run update` or `node updateFoods.js`. There's also a flag for `--overwrite` or `npm run updateOverwrite` if you'd like to replace the files if they already exist.
+- Populate your current existing images _(from all `<date>/images` folders)_ automatically into `results/assets/foods` with `npm run update` or `node updateFoods.js`. There's also a flag for `--overwrite` or `npm run updateOverwrite` if you'd like to replace the files if they already exist.
 
 - Trim all images with `npm run trim` or `node trimImages.js`. Target location is `./results/assets/foods/`.
 
-  > This is already done automatically for your current `date/images` folder whenever you use `generateVid` (step **3**)
+  > This is already done automatically for your current `<date>/images` folder whenever you use `generateVid` (step **3**)
 
 - If you're out of ideas and lazy to find new lists but have plenty of images in `./results/assets/foods/`, run `npm run genlist` or `node run randomFoodsGen.js` for a list of `15` foods by default (adjustable in the `FOODS_AMOUNT` constant at the top).
 
@@ -35,3 +35,5 @@
 > Eat or pass - picky eater edition 🍳
 
 > #eat #eatorpass #game #foodlover #pickyeater
+
+![Example Directories / Layout](https://cdn.discordapp.com/attachments/453189142009085961/1514325962509258865/Untitled.png?ex=6a2af574&is=6a29a3f4&hm=e19b233b6ef34fc8345b053e272085bccc8c18da6139a495c02a0cc04c7b7f8b&)
