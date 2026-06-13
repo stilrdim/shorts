@@ -427,7 +427,7 @@ async function main() {
   console.log("\nUpload to\nhttps://studio.youtube.com/channel/UCAaRyww02jzv6SNlK2tqJ9Q\nhttps://www.tiktok.com/tiktokstudio/content");
   console.log(`\nDescription:\nEat or pass - ${EDITION.toLowerCase()} edition`);
   console.log(`\nHashtags:\n#eat #eatorpass #game #foodlover #pickyeater`);
-  console.log(`Video folder: ${VID_DIR}`);
+  console.log(`Video folder: file:///${VID_DIR}`);
 }
 //#endregion Main
 
