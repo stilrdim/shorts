@@ -7,8 +7,10 @@ const sharp = require("sharp");
 sharp.cache(false)
 
 // Voices preview: https://tts.travisvn.com/
-const MAIN_VOICE = "en-US-AriaNeural";
-const SECONDARY_VOICE = "en-US-EricNeural";
+// Default male   :    en-US-EricNeural
+// Default female :    en-US-AriaNeural
+const MAIN_VOICE = "en-US-EricNeural";
+const SECONDARY_VOICE = "en-US-AriaNeural";
 
 //#region Process Args
 // Toggle CTA for engagement bait   (targeted at TikTok)
