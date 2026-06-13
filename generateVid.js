@@ -423,10 +423,11 @@ async function main() {
   );
 
   console.log("\nDONE:", OUTPUT_FINAL);
-  console.log(`\n\n\nDifferent voice on slide #${randomImageIndex + 1} (${path.basename(images[randomImageIndex])})`)
-  console.log("\nUpload to\nhttps://studio.youtube.com/channel/UCAaRyww02jzv6SNlK2tqJ9Q\nhttps://www.tiktok.com/tiktokstudio/content")
-  console.log(`\nDescription:\nEat or pass - ${EDITION.toLowerCase()} edition`)
-  console.log(`\nHashtags:\n#eat #eatorpass #game #foodlover #pickyeater`)
+  console.log(`\n\n\nDifferent voice on slide #${randomImageIndex + 1} (${path.basename(images[randomImageIndex])})`);
+  console.log("\nUpload to\nhttps://studio.youtube.com/channel/UCAaRyww02jzv6SNlK2tqJ9Q\nhttps://www.tiktok.com/tiktokstudio/content");
+  console.log(`\nDescription:\nEat or pass - ${EDITION.toLowerCase()} edition`);
+  console.log(`\nHashtags:\n#eat #eatorpass #game #foodlover #pickyeater`);
+  console.log(`Video folder: ${VID_DIR}`);
 }
 //#endregion Main
 
