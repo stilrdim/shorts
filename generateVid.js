@@ -389,6 +389,7 @@ async function main() {
   images.forEach((img, i) => {
     const name = path.basename(img)
       .replace(/\.[^/.]+$/, "")
+      .replace(/\d/g, "") // Remove digits from pics with multiple options
       .replace(/_/g, " ");
     const out = path.join(OUTPUT_DIR, `clip_${i}.mp4`);
 
