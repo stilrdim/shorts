@@ -30,10 +30,19 @@
 
 > `npm run fetchextra -- -1` for **negatives** _(yesterday)_
 
-### Example description
+## Example description
 
 > Eat or pass - picky eater edition 🍳
 
 > #eat #eatorpass #game #foodlover #pickyeater
+
+## Current accounts
+
+### You can see the way the vids currently look at:
+
+- [YouTube](https://www.youtube.com/@snackchoice2504/shorts)
+- [TikTok](https://www.tiktok.com/@snackchoice2504)
+
+## Example directories / layout
 
 ![Example Directories / Layout](https://i.ibb.co/pH3p3sn/eatorpass.png)
