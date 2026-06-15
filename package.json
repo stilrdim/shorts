@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "1": "node initialize.js",
-    "2": "node fetchImages.js",
-    "3": "node generateVid.js",
+    "2": "node fetchImages.js --extradays",
+    "3": "node generateVid.js --extradays",
     "test": "node test.js",
     "init": "node initialize.js",
     "initialize": "node initialize.js",
