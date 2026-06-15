@@ -61,7 +61,7 @@ function main() {
 
   foods.forEach((f) => console.log(f));
 
-  console.log(`Today's directory: file///${VID_DIR}`);
+  console.log(`Today's directory: file:///${VID_DIR}`);
   console.log(`Foods.txt: file:///${VID_DIR}/foods.txt`);
 }
 
