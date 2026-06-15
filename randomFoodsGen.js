@@ -4,12 +4,31 @@ const path = require("path");
 
 const FOODS_AMOUNT = 15;
 
-const todaysDate = new Date().toISOString().split("T")[0];
+
+// Able to run the script for tomorrow or further
+const extraDaysArg = process.argv.indexOf("--extradays");
+let EXTRA_DAYS = extraDaysArg !== -1 ? Number(process.argv[extraDaysArg + 1]) : 0;
+if (!EXTRA_DAYS) { // Empty space returning   undefined => NaN
+  EXTRA_DAYS = 0;
+}
+
+
 
 const BASE_DIR = path.join(__dirname, "results");
 const FOODS_DIR = path.join(BASE_DIR, "assets", "foods");
-const VIDEO_DIR = path.join(BASE_DIR, todaysDate);
+const VID_DATE = getVidDate();
+const VID_DIR = path.join(BASE_DIR, VID_DATE);
 
+
+function getVidDate() {
+  const date = new Date();
+
+  date.setDate(date.getDate() + EXTRA_DAYS);
+
+  const convertedDate = date.toISOString().split("T")[0];
+
+  return convertedDate
+}
 
 function getRandomFood(foodList) {
   const maxNumber = foodList.length;
@@ -42,8 +61,8 @@ function main() {
 
   foods.forEach((f) => console.log(f));
 
-  console.log(`Today's directory: file///${VIDEO_DIR}`);
-  console.log(`Foods.txt: file:///${VIDEO_DIR}/foods.txt`);
+  console.log(`Today's directory: file///${VID_DIR}`);
+  console.log(`Foods.txt: file:///${VID_DIR}/foods.txt`);
 }
 
 main();

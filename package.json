@@ -25,7 +25,7 @@
     "trim": "node trimImages.js",
     "trimImages": "node trimImages.js",
     "trimDownloads": "node trimImages.js --downloads",
-    "genlist": "node randomFoodsGen.js"
+    "genlist": "node randomFoodsGen.js --extradays"
   },
   "keywords": [],
   "author": "",

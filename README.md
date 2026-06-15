@@ -20,9 +20,9 @@
 
   > This is already done automatically for your current `<date>/images` folder whenever you use `generateVid` (step **3**)
 
-- If you're out of ideas and lazy to find new lists but have plenty of images in `./results/assets/foods/`, run `npm run genlist` or `node run randomFoodsGen.js` for a list of `15` foods by default (adjustable in the `FOODS_AMOUNT` constant at the top).
+- If you're out of ideas and lazy to find new lists but have plenty of images in `./results/assets/foods/`, run `npm run genlist`**\*** or `node run randomFoodsGen.js` for a list of `15` foods by default (adjustable in the `FOODS_AMOUNT` constant at the top).
 
-### \* Applies for `fetchImages` and `generateVid` (step **2** and **3**)
+### \* Applies for `fetchImages`, `generateVid` (step **2** and **3**) and `npm run genlist`
 
 > Use `node fetchImages.js --extraday 1` to check tomorrow's list
 
