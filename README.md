@@ -36,4 +36,4 @@
 
 > #eat #eatorpass #game #foodlover #pickyeater
 
-![Example Directories / Layout](https://cdn.discordapp.com/attachments/453189142009085961/1514325962509258865/Untitled.png?ex=6a2af574&is=6a29a3f4&hm=e19b233b6ef34fc8345b053e272085bccc8c18da6139a495c02a0cc04c7b7f8b&)
+![Example Directories / Layout](https://i.ibb.co/pH3p3sn/eatorpass.png)
