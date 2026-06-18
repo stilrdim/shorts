@@ -12,6 +12,9 @@ sharp.cache(false)
 const MAIN_VOICE = "en-US-EricNeural";
 const SECONDARY_VOICE = "en-US-AriaNeural";
 
+// Store hardcoded FIRST_VID_DATE to calculate the video number in the intro/thumbnail
+const FIRST_VID_DATE = "2026-05-26";
+
 //#region Process Args
 // Toggle CTA for engagement bait   (targeted at TikTok)
 const ENABLE_CTA = process.argv.includes("--cta");
@@ -27,10 +30,10 @@ if (!EXTRA_DAYS) { // Empty space returning   undefined => NaN
 //#endregion Process Args
 
 //#region Constants
-const VIDEO_DATE = getVidDate();
+const VID_DATE = getVidDate();
 
 const BASE_DIR = path.join(__dirname, "results");
-const VID_DIR = path.join(BASE_DIR, VIDEO_DATE);
+const VID_DIR = path.join(BASE_DIR, VID_DATE);
 const VID_IMAGES_DIR = path.join(VID_DIR, "images");
 const OUTPUT_DIR = path.join(VID_DIR, "temp");
 const OUTPUT_FINAL = path.join(VID_DIR, "output.mp4");
@@ -87,12 +90,22 @@ function getVidDate() {
   return convertedDate
 }
 
+// Replaced by daysSinceFirstVid
 function getVidNumber(directory, date) {
   const allFiles = fs.readdirSync(directory, { recursive: true });
 
   const videos = allFiles.filter(file => file.includes("output.mp4") && !file.includes(date));
 
   return videos.length + 1;
+}
+
+// Gives the #23 type of heading in the intro/thumbnail
+function daysSinceFirstVid(asOfDate) {
+  const d1 = new Date(FIRST_VID_DATE);
+  const d2 = new Date(asOfDate);
+
+  const msPerDay = 1000 * 60 * 60 * 24;
+  return Math.round((d2 - d1) / msPerDay);
 }
 
 function estimateTextWidth(text, fontSize = 96) {
@@ -155,7 +168,7 @@ function makeThumbnail(introPath, outPath) {
 function makeIntro(outPath, images, duration = 5) {
   const safeOut = outPath.replace(/\\/g, "/");
   const line2 = escapeText(`${EDITION.toUpperCase()} EDITION`);
-  const videoNumber = getVidNumber(BASE_DIR, VIDEO_DATE);
+  const videoNumber = daysSinceFirstVid(VID_DATE).toString()
   const picks = pickRandom(images, 4).map(p => p.replace(/\\/g, "/"));
   const audioOut = outPath.replace(".mp4", ".mp3").replace(/\\/g, "/");
   makeTTS(`Eat or Pass. ${EDITION} Edition`, audioOut, duration);
@@ -439,7 +452,7 @@ async function main() {
   console.log(`\nHashtags:\n#eat #eatorpass #game #foodlover #pickyeater`);
 
   // Check for --open-after-generating
-  OPEN_IN_EXPLORER ? openInExplorer(VID_DIR) : console.log(`Video folder: file:///${VID_DIR}`);
+  ENABLE_OPEN_IN_EXPLORER ? openInExplorer(VID_DIR) : console.log(`Video folder: file:///${VID_DIR}`);
 }
 //#endregion Main
 
