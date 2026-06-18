@@ -40,7 +40,7 @@ function getRandomFood(foodList) {
 function generateList(desiredFoodsAmount) {
   const allImages = fs.readdirSync(FOODS_DIR, { encoding: "utf-8" });
 
-  const allFoods = allImages.map(file => file.replaceAll("_", " ").replace(/\d/, "").split(".")[0].trim());
+  const allFoods = allImages.map(file => file.replaceAll("_", " ").replace(/\d/g, "").split(".")[0].trim());
 
   const generatedFoodList = new Set();
 
