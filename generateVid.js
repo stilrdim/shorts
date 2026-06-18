@@ -16,6 +16,7 @@ const SECONDARY_VOICE = "en-US-AriaNeural";
 // Toggle CTA for engagement bait   (targeted at TikTok)
 const ENABLE_CTA = process.argv.includes("--cta");
 const DISABLE_SHUFFLE = process.argv.includes("--noshuffle");
+const ENABLE_OPEN_IN_EXPLORER = process.argv.includes("--open-after-generating")
 
 // Able to run the script for tomorrow or further
 const extraDaysArg = process.argv.indexOf("--extradays");
@@ -117,6 +118,14 @@ function escapeText(t) {
     .replace(/:/g, "\\:")
     .replace(/\[/g, "\\[")
     .replace(/\]/g, "\\]");
+}
+
+function openInExplorer(dir) {
+  try {
+    execSync(`explorer ${dir}`, { stdio: "inherit" });
+  } catch (err) {
+    // Wrong error code returned from Explorer. Safe to ignore if the folder opens regardless
+  }
 }
 
 //#endregion UTILS
@@ -428,7 +437,9 @@ async function main() {
   console.log("\nUpload to\nhttps://studio.youtube.com/channel/UCAaRyww02jzv6SNlK2tqJ9Q\nhttps://www.tiktok.com/tiktokstudio/content");
   console.log(`\nDescription:\nEat or pass - ${EDITION.toLowerCase()} edition`);
   console.log(`\nHashtags:\n#eat #eatorpass #game #foodlover #pickyeater`);
-  console.log(`Video folder: file:///${VID_DIR}`);
+
+  // Check for --open-after-generating
+  OPEN_IN_EXPLORER ? openInExplorer(VID_DIR) : console.log(`Video folder: file:///${VID_DIR}`);
 }
 //#endregion Main
 

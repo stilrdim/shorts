@@ -153,7 +153,7 @@ function main() {
 
   console.log(foodListTitle, "\n");
   console.log(foodToUrlMap);
-  console.log("\n", foodItems.join(", "));
+  // console.log("\n", foodItems.join(", "));
 }
 
 main()

@@ -30,6 +30,8 @@
 
 > `npm run fetchextra -- -1` for **negatives** _(yesterday)_
 
+> `npm run generateVid.js` has `--open-after-generating` argument to open folder in Explorer automatically
+
 ## Example description
 
 > Eat or pass - picky eater edition 🍳

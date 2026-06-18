@@ -6,7 +6,7 @@
   "scripts": {
     "1": "node initialize.js",
     "2": "node fetchImages.js --extradays",
-    "3": "node generateVid.js --extradays",
+    "3": "node generateVid.js --open-after-generating --extradays",
     "test": "node test.js",
     "init": "node initialize.js",
     "initialize": "node initialize.js",
