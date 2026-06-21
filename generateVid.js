@@ -1,4 +1,5 @@
 const { execSync } = require("child_process");
+const { default: clipboard } = require("clipboardy");
 const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
@@ -19,7 +20,8 @@ const FIRST_VID_DATE = "2026-05-26";
 // Toggle CTA for engagement bait   (targeted at TikTok)
 const ENABLE_CTA = process.argv.includes("--cta");
 const DISABLE_SHUFFLE = process.argv.includes("--noshuffle");
-const ENABLE_OPEN_IN_EXPLORER = process.argv.includes("--open-after-generating")
+const ENABLE_OPEN_IN_EXPLORER = process.argv.includes("--open-after-generating");
+const ENABLE_CLIPBOARD_AUTO_COPY = process.argv.includes("--clipboard");
 
 // Able to run the script for tomorrow or further
 const extraDaysArg = process.argv.indexOf("--extradays");
@@ -99,7 +101,7 @@ function getVidNumber(directory, date) {
   return videos.length + 1;
 }
 
-// Gives the #23 type of heading in the intro/thumbnail
+// Gives the "#23" type of heading in the intro/thumbnail
 function daysSinceFirstVid(asOfDate) {
   const d1 = new Date(FIRST_VID_DATE);
   const d2 = new Date(asOfDate);
@@ -445,14 +447,22 @@ async function main() {
     { stdio: "inherit" }
   );
 
+  const vidDescription = `Eat or pass - ${EDITION.toLowerCase()} edition`;
+
   console.log("\nDONE:", OUTPUT_FINAL);
   console.log(`\n\n\nDifferent voice on slide #${randomImageIndex + 1} (${path.basename(images[randomImageIndex])})`);
   console.log("\nUpload to\nhttps://studio.youtube.com/channel/UCAaRyww02jzv6SNlK2tqJ9Q\nhttps://www.tiktok.com/tiktokstudio/content");
-  console.log(`\nDescription:\nEat or pass - ${EDITION.toLowerCase()} edition`);
+  console.log(`\nDescription:\n${vidDescription}`);
   console.log(`\nHashtags:\n#eat #eatorpass #game #foodlover #pickyeater`);
 
   // Check for --open-after-generating
   ENABLE_OPEN_IN_EXPLORER ? openInExplorer(VID_DIR) : console.log(`Video folder: file:///${VID_DIR}`);
+
+  // Check for --clipboard
+  if (ENABLE_CLIPBOARD_AUTO_COPY) {
+    clipboard.writeSync(vidDescription);
+    console.log("\n[--clipboard] Video description automatically saved to clipboard.")
+  };
 }
 //#endregion Main
 

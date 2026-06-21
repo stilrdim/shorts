@@ -1,9 +1,12 @@
+const { default: clipboard } = require("clipboardy");
 const fs = require("fs");
 const path = require("path");
 
 
 const FOODS_AMOUNT = 15;
 
+// PROCESS ARGS
+const ENABLE_CLIPBOARD_AUTO_COPY = process.argv.includes("--clipboard");
 
 // Able to run the script for tomorrow or further
 const extraDaysArg = process.argv.indexOf("--extradays");
@@ -59,10 +62,17 @@ function main() {
 
   console.log(`Generating ${FOODS_AMOUNT} foods:\n`);
 
-  foods.forEach((f) => console.log(f));
+  const foodsStr = [...foods].join("\n");
+  // foods.forEach((f) => console.log(f));
+  console.log(foodsStr);
 
   console.log(`Today's directory: file:///${VID_DIR}`);
   console.log(`Foods.txt: file:///${VID_DIR}/foods.txt`);
+
+  if (ENABLE_CLIPBOARD_AUTO_COPY) {
+    clipboard.writeSync(foodsStr);
+    console.log("\n[--clipboard] Foods automatically saved to clipboard.")
+  }
 }
 
 main();

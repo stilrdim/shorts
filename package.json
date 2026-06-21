@@ -6,7 +6,7 @@
   "scripts": {
     "1": "node initialize.js",
     "2": "node fetchImages.js --extradays",
-    "3": "node generateVid.js --open-after-generating --extradays",
+    "3": "node generateVid.js --open-after-generating --clipboard --extradays",
     "test": "node test.js",
     "init": "node initialize.js",
     "initialize": "node initialize.js",
@@ -25,13 +25,14 @@
     "trim": "node trimImages.js",
     "trimImages": "node trimImages.js",
     "trimDownloads": "node trimImages.js --downloads",
-    "genlist": "node randomFoodsGen.js --extradays"
+    "genlist": "node randomFoodsGen.js --clipboard --extradays"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "clipboardy": "^5.3.1",
     "sharp": "^0.34.5"
   }
 }
