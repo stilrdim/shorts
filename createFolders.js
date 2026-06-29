@@ -1,6 +1,14 @@
 const fs = require("fs");
 const path = require("path");
 
+// ARGS
+const amountOfDaysArg = process.argv.indexOf("--days");
+let AMOUNT_OF_DAYS = amountOfDaysArg !== -1 ? Number(process.argv[amountOfDaysArg + 1]) : 7;
+if (!AMOUNT_OF_DAYS) { // Empty space returning   undefined => NaN
+  AMOUNT_OF_DAYS = 7;
+}
+
+
 // Example: 2026-05-27
 const date = new Date().toISOString().split("T")[0]
 
@@ -28,7 +36,7 @@ function initializeFolder(folderName) {
 
 function getWeeklyDates() {
   let folderNames = [];
-  for (let i = 0; i <= 7; i++) {
+  for (let i = 0; i <= AMOUNT_OF_DAYS; i++) {
     const date = new Date();
 
     date.setDate(date.getDate() + i);

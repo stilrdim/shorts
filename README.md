@@ -2,7 +2,10 @@
 
 ## Instructions
 
-1. Run `node initialize.js` or `npm run 1` / `npm run init` to create a new folder inside `results/` for each of the next 7 days
+1. Run `node createFolders.js` or `npm run 1` / `npm run init` to create a new folder inside `results/` for each of the next 7 days
+
+- Use `node creatFolders.js` `--days <amount>` to customize amount of days
+
 2. Generate 15 food items (with AI)
 3. First line in `foods.txt` is `EDITION_NAME` (Ex. `Picky Eater`), second line is emoji if needed
 4. Food items are on the remaining lines **(3-17)**
